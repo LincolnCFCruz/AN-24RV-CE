@@ -1,0 +1,28 @@
+# EditorConfig — https://editorconfig.org
+#
+# Purpose: lock in the file conventions this codebase already depends on, so
+# editors stop silently corrupting files. Per CLAUDE.md hard rule 3 the sources
+# are UTF-8 *without* BOM and contain non-ASCII (em-dashes, occasional Cyrillic);
+# tools that re-encode them double-encode every such char, and CRLF slips in via
+# some editors (it has). charset/end_of_line below prevent both, tree-wide.
+#
+# Indentation is intentionally NOT normalised across the tree. The original
+# instrument/system modules are tab-indented (their authors' style); the core/
+# infrastructure and refactor-era code use 4-space spaces (see CLAUDE.md
+# "History"). This file does NOT reformat existing files — the [*.lua] block is
+# only the going-forward default for NEW code and matches the modernised
+# majority. The legacy tab-indented modules are left as-is to preserve git blame.
+root = true
+
+# Applies everywhere (incl. .md/.txt/.obj): the anti-corruption essentials only.
+[*]
+charset = utf-8
+end_of_line = lf
+
+# Lua sources: default style for new code + whitespace hygiene. Scoped to *.lua
+# so it never touches X-Plane config/obj/text files.
+[*.lua]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
