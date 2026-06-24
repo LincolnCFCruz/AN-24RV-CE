@@ -22,7 +22,7 @@ Or clone the repository directly:
 
 ```sh
 cd "X-Plane 12/Aircraft/Antonov"
-git clone https://github.com/LincolnCFCruz/An-24.git An-24
+git clone https://github.com/LincolnCFCruz/AN-24RV-CE.git AN-24RV-CE
 ```
 
 Launch X-Plane 12 and select the Antonov An-24RV from the aircraft menu.
