@@ -20,7 +20,7 @@ Fork the repository and clone it directly into your X-Plane installation:
 
 ```sh
 cd "X-Plane 12/Aircraft/Antonov"
-git clone https://github.com/<your-user>/An-24.git An-24
+git clone https://github.com/LincolnCFCruz/AN-24RV-CE.git AN-24RV-CE
 ```
 
 The repository root is the aircraft directory.
