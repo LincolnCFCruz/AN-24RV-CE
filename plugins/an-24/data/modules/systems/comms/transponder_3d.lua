@@ -24,79 +24,56 @@ defineProperty("sq_sw", globalProperty("an-24/sq/sq_sw"))
 defineProperty("bus_DC_27_volt_emerg", globalProperty("an-24/power/bus_DC_27_volt_emerg"))
 defineProperty("sq_cc", globalProperty("an-24/sq/sq_cc"))
 
--- initial switchers values
-defineProperty("N1", globalProperty("sim/flightmodel/engine/ENGN_N2_[0]"))
-defineProperty("N2", globalProperty("sim/flightmodel/engine/ENGN_N2_[1]"))
-defineProperty("frame_time", globalProperty("an-24/time/frame_time")) -- time for frames
-
-local time_counter = 0
-local not_loaded = true
-
-function update()
-    -- initial switchers values
-    time_counter = time_counter + get(frame_time)
-    if get(N1) < 70 and get(N2) < 70 and time_counter > 0.3 and time_counter < 0.4 and not_loaded then
-        set(sq_sw, 0)
-        not_loaded = false
-    end
-end
-
 local snd = loadUISounds()
 local switch_sound, cap_sound, btn_click, rot_click, plastic_sound = snd.switch, snd.cap, snd.btn, snd.rot, snd.plastic
 
 local emergency = false
 local power = false -- transponder's power
-local last_code = get(xpdr_code)
+
+-- Shadow of the crew-set code, edited/shown while an emergency 7700 is squawked.
+local current_code = get(xpdr_code)
 
 function getDigits(squawk)
-    local d1 = math.floor(squawk / 1000)
-    squawk = squawk - d1 * 1000
-    local d2 = math.floor(squawk / 100)
-    squawk = squawk - d2 * 100
-    local d3 = math.floor(squawk / 10)
-    local d4 = squawk - d3 * 10
-    return d1, d2, d3, d4
+    local thousands = math.floor(squawk / 1000)
+    local hundreds  = math.floor(squawk / 100) % 10
+    local tens      = math.floor(squawk / 10) % 10
+    local ones      = squawk % 10
+
+    return thousands, hundreds, tens, ones
 end
 
--- set transponder code
-function setSquawk(d1, d2, d3, d4)
-    last_code = d1 * 1000 + d2 * 100 + d3 * 10 + d4
-    if not emergency then
-        set(xpdr_code, last_code)
-    else
-        set(xpdr_code, 7700)
+local function getCode()
+    if emergency then 
+        return current_code 
+    else 
+        return get(xpdr_code) 
     end
 end
 
--- first digit of squawk code
-defineProperty("code_1", function()
-    local d1, d2, d3, d4 = getDigits(last_code)
-    return d1
-end)
+local function setCode(code)
+    if emergency then
+        current_code = code
+    else
+        set(xpdr_code, code)
+    end
+end
 
--- second digit of squawk code
-defineProperty("code_2", function(self, value)
-    local d1, d2, d3, d4 = getDigits(last_code)
-    return d2
-end)
+-- Sets one squawk digit (1..4). Value is clamped to 0..7.
+local function setDigit(index, value)
+    local clamped = math.clamp(0, value, 7)
 
--- third digit of squawk code
-defineProperty("code_3", function(self, value)
-    local d1, d2, d3, d4 = getDigits(last_code)
-    return d3
-end)
+    local digits = { getDigits(getCode()) }
+    digits[index] = clamped
 
--- last digit of squawk code
-defineProperty("code_4", function(self, value)
-    local d1, d2, d3, d4 = getDigits(last_code)
-    return d4
-end)
+    setCode(
+        digits[1] * 1000 +
+        digits[2] * 100 +
+        digits[3] * 10 +
+        digits[4]
+    )
 
--- set knobs initial positions
-set(digit_1, get(code_1))
-set(digit_2, get(code_2))
-set(digit_3, get(code_3))
-set(digit_4, get(code_4))
+    return clamped
+end
 
 function update()
     power = get(sq_sw) > 0 and (get(xpdr_fail) or 0) < 6 and get(bus_DC_27_volt_emerg) > 21
@@ -107,6 +84,13 @@ function update()
         set(xpdr_mode, 0)
         set(sq_cc, 0)
     end
+
+    -- mirror the live code onto the public digit datarefs (3D knobs + 2D readout)
+    local d1, d2, d3, d4 = getDigits(getCode())
+    set(digit_1, d1)
+    set(digit_2, d2)
+    set(digit_3, d3)
+    set(digit_4, d4)
 end
 
 -- transponder cosist of several components
@@ -148,14 +132,7 @@ components = {
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
             end
-            if 0 > v then
-                v = 0;
-            elseif 7 < v then
-                v = 7
-            end
-            local d1, d2, d3, d4 = getDigits(last_code)
-            setSquawk(v, d2, d3, d4)
-            return v
+            return setDigit(1, v)
         end
     }, 
     
@@ -167,14 +144,7 @@ components = {
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
             end
-            if 0 > v then
-                v = 0;
-            elseif 7 < v then
-                v = 7
-            end
-            local d1, d2, d3, d4 = getDigits(last_code)
-            setSquawk(d1, v, d3, d4)
-            return v
+            return setDigit(2, v)
         end
     }, 
     
@@ -186,14 +156,7 @@ components = {
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
             end
-            if 0 > v then
-                v = 0;
-            elseif 7 < v then
-                v = 7
-            end
-            local d1, d2, d3, d4 = getDigits(last_code)
-            setSquawk(d1, d2, v, d4)
-            return v
+            return setDigit(3, v)
         end
     }, 
     
@@ -205,14 +168,7 @@ components = {
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
             end
-            if 0 > v then
-                v = 0;
-            elseif 7 < v then
-                v = 7
-            end
-            local d1, d2, d3, d4 = getDigits(last_code)
-            setSquawk(d1, d2, d3, v)
-            return v
+            return setDigit(4, v)
         end
     }, 
     
@@ -243,11 +199,12 @@ components = {
                 emergency = not emergency
                 if emergency then
                     set(emerg, 1)
+                    current_code = get(xpdr_code)
+                    set(xpdr_code, 7700)
                 else
                     set(emerg, 0)
+                    set(xpdr_code, current_code)
                 end
-                local d1, d2, d3, d4 = getDigits(last_code)
-                setSquawk(d1, d2, d3, d4)
             end
             return true
         end,
