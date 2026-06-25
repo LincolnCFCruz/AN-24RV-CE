@@ -16,7 +16,7 @@ No additional dependencies are required. SASL3 is included with the aircraft.
 
 ## Installation
 
-Copy the `An-24` directory into your `X-Plane 12/Aircraft/` folder.
+Copy the `AN-24RV-CE` directory into your `X-Plane 12/Aircraft/` folder.
 
 Or clone the repository directly:
 

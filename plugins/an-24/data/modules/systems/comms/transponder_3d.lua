@@ -143,7 +143,7 @@ components = {
     -- digit 1
     rotary {
         position = {4, 2, 10, 10},
-        value = code_1,
+        value = digit_1,
         adjuster = function(v)
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
@@ -155,14 +155,14 @@ components = {
             end
             local d1, d2, d3, d4 = getDigits(last_code)
             setSquawk(v, d2, d3, d4)
-            set(digit_1, get(code_1))
+            return v
         end
     }, 
     
     -- digit 2
     rotary {
         position = {17, 2, 10, 10},
-        value = code_2,
+        value = digit_2,
         adjuster = function(v)
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
@@ -174,14 +174,14 @@ components = {
             end
             local d1, d2, d3, d4 = getDigits(last_code)
             setSquawk(d1, v, d3, d4)
-            set(digit_2, get(code_2))
+            return v
         end
     }, 
     
     -- digit 3
     rotary {
         position = {31, 2, 10, 10},
-        value = code_3,
+        value = digit_3,
         adjuster = function(v)
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
@@ -193,14 +193,14 @@ components = {
             end
             local d1, d2, d3, d4 = getDigits(last_code)
             setSquawk(d1, d2, v, d4)
-            set(digit_3, get(code_3))
+            return v
         end
     }, 
     
     -- digit 4
     rotary {
         position = {45, 2, 10, 10},
-        value = code_4,
+        value = digit_4,
         adjuster = function(v)
             if v >= 0 and v <= 7 then
                 sasl.al.playSample(plastic_sound, false)
@@ -212,7 +212,7 @@ components = {
             end
             local d1, d2, d3, d4 = getDigits(last_code)
             setSquawk(d1, d2, d3, v)
-            set(digit_4, get(code_4))
+            return v
         end
     }, 
     
