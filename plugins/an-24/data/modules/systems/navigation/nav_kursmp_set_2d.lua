@@ -22,8 +22,6 @@ end
 
 local rot_click = loadSample('sounds/custom/rot_click.wav')
 
--- device consist of several components
-
 components = { 
     ------------
     -- images --

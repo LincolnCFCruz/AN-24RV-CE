@@ -33,8 +33,6 @@ function update()
     freq_10_show = freq_10 * 10 + freq_last
 end
 
--- device consist of several components
-
 components = { 
     ------------
     -- images --

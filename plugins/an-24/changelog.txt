@@ -1,4 +1,11 @@
 ----------------------------------------------------------
+SASL 3.22.5
+----------------------------------------------------------
+
+- Fixed possible Lua stack mismanagements on C side that may result in "stack overflow" errors
+- Fixed incorrect handling of unfinished async objects loading request when project is unloading
+
+----------------------------------------------------------
 SASL 3.22.3
 ----------------------------------------------------------
 

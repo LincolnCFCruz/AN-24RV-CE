@@ -93,8 +93,6 @@ function update()
     set(digit_4, d4)
 end
 
--- transponder cosist of several components
-
 components = { 
     -- power switch
     toggleSwitch {

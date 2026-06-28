@@ -20,8 +20,6 @@ function update()
     fromto_light = get(fromto_lit)
 end
 
--- device consist of several components
-
 components = { 
     ------------
     -- images --

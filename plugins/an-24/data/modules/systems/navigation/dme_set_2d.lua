@@ -26,8 +26,6 @@ function update()
 
 end
 
--- device consists of several components
-
 components = { 
     ------------
     -- images --
