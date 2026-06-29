@@ -32,18 +32,19 @@ defineProperty("fcd_frame_time", globalProperty("an-24/time/frame_time"))
 -- itself limits the ceiling.
 local fuse_cd_table = { -- {altitude_m, fuse_cd}
     {-500, 0.410}, -- below sea level (margin)
-    {0, 0.410}, -- sea level
+    {   0, 0.410}, -- sea level
     {1000, 0.390}, 
     {2000, 0.360}, -- strengthened to slow down to ~360 km/h
     {3000, 0.300}, 
-    {4000, 0.240}, 
-    {5000, 0.120}, -- moderate (there was an IAS dip here)
-    {6000, 0.060}, -- near base — let it fly free (target IAS 325)
-    {7000, 0.030}, -- base — at the ceiling power is the limit anyway
-    {8000, 0.030}, 
-    {9000, 0.030}, 
-    {10000, 0.030}, 
-    {15000, 0.030}
+    {4000, 0.240}, -- increased from 0.100 (aircraft was too fast)
+    {5000, 0.180}, -- moderate (there was an IAS dip)
+    {6000, 0.120}, -- base - allow the aircraft to fly freely (target IAS 325)
+    {7000, 0.100}, -- base - engine power limits performance at the ceiling
+    {8000, 0.100},
+    {9000, 0.100}, 
+    {10000, 0.100}, 
+    {15000, 0.100}, 
+    {30000, 0.100}
 }
 
 local function interpolate_table(tbl, x)
