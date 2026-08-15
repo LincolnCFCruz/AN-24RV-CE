@@ -39,8 +39,14 @@ local right_rud_current = 0.05 -- smoothed right engine RUD
 local KTA24_RATE = 2.5 -- KTA-24 response rate (smaller = slower)
 
 -- Interpolation table for throttles
--- V11 "intermediate calibration" (30.05.2026): midpoint between the RLE-derived
--- calibration (0.722 at 52 deg) and the original Parshukov values (0.490).
+-- v12 calibration (14.08.2026, 43 test flights): the cruise point is set from
+-- measured performance rather than the earlier V11 compromise (0.580 at 52 deg,
+-- a midpoint between the RLE-derived 0.722 and Parshukov's original 0.490).
+-- 0.807 at 52 deg gives TAS 474-484 km/h at 6000 m against the AFM's 460-472.
+-- This value is calibrated TOGETHER with the .acf misc-body drag (fuselage
+-- Cd 0.085 + An-26 engine nacelles) and _power_max_limit 2810 — with
+-- fuse_cd_logic no longer overriding acf_fuse_cd at runtime. Do not retune one
+-- of those three in isolation.
 -- Low points (0.00-0.18) set the base idle; idle_correction_table then boosts the
 -- idle band toward N1 ~94% per the RLE (see Discovery #13 below).
 local tro_table = {
@@ -53,7 +59,7 @@ local tro_table = {
     {0.26, 0.340}, --  26 deg UPRT: taxi high
     {0.34, 0.430}, --  34 deg UPRT: 0.6 nominal (intermediate)
     {0.41, 0.500}, --  41 deg UPRT: 0.7 nominal (intermediate)
-    {0.52, 0.580}, --  52 deg UPRT: cruise (between RLE 0.722 and old 0.490)
+    {0.52, 0.807}, --  52 deg UPRT: cruise (v12 — measured against AFM, see above)
     {0.65, 0.700}, --  65 deg UPRT: nominal (between RLE 0.850 and old 0.555)
     {0.74, 0.770}, --  74 deg UPRT
     {0.87, 0.850}, --  87 deg UPRT: lower bound of takeoff regime
@@ -247,19 +253,23 @@ local function smooth(thro, need, rate)
     return thro + (need - thro) * gvar.frame_time * k
 end
 
--- V11 idle correction blend: full at idle, fading out by taxi so the boost never
+-- Idle correction blend: full at idle, fading out by taxi so the boost never
 -- touches the cruise/climb/takeoff calibration.
 --   UPRT <= 10% (ground/flight idle): blend = 1.0 (full correction)
---   UPRT 10%..18%: linear fade
---   UPRT >= 18% (taxi and above): blend = 0.0 (no correction)
+--   UPRT 10%..30%: linear fade
+--   UPRT >= 30% (above taxi): blend = 0.0 (no correction)
+-- v12 fix (13.06.2026): the fade used to end at UPRT 18%, which left a power
+-- dip across UPRT 10-30% while taxiing — the boost was gone before tro_table
+-- had risen to meet it. Ending at 30% closes the gap and still finishes far
+-- below the 52 deg cruise point, so the cruise calibration is untouched.
 local function idle_blend_factor(rud)
     if rud <= 0.10 then
         return 1.0
     end
-    if rud >= 0.18 then
+    if rud >= 0.30 then
         return 0.0
     end
-    return 1.0 - (rud - 0.10) / 0.08
+    return 1.0 - (rud - 0.10) / 0.20
 end
 
 function update()

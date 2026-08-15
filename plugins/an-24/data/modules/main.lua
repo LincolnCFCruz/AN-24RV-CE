@@ -41,7 +41,7 @@ addSearchPath(moduleDirectory.."/components")
 addSearchPath(moduleDirectory.."/panels")
 addSearchPath(moduleDirectory.."/menu")
 
--- Avionics — by-system folders (role is the file-name suffix; see CLAUDE.md + REORG_MANIFEST.md)
+-- Avionics — by-system folders (role is the file-name suffix; see CLAUDE.md "Module Types")
 addSearchPath(moduleDirectory.."/systems/electrical")
 addSearchPath(moduleDirectory.."/systems/fuel")
 addSearchPath(moduleDirectory.."/systems/powerplant")
@@ -104,7 +104,7 @@ panel_windows {}
 -- Developer tool: System Viewer / Debug Inspector. Self-contained floating
 -- window (own contextWindow + bindable command "An-24/Debug/inspector").
 -- Reads system datarefs read-only; does not touch systems code. See
--- systems/popups/debug_inspector.lua.
+-- systems/debug/debug_inspector.lua.
 -- -------------------------------------------------------
 debug_inspector {}
 
@@ -178,7 +178,9 @@ components = {
   start_lock_logic       {},  -- prop low-pitch stop — protects against spontaneous feathering at low RPM
   autofeather_logic      {},  -- automatic prop feathering per RLE (by IKM/N1)
   prop_commands_logic    {},  -- prop pitch stop commands for keyboard/joystick
-  fuse_cd_logic          {},  -- fuselage drag correction vs altitude (RLE speed calibration)
+  -- fuse_cd_logic       {},  -- NOT REGISTERED since the v12 calibration: fuselage/nacelle
+                              -- drag now lives in the .acf misc bodies, so nothing overrides
+                              -- acf_fuse_cd at runtime. See systems/aero/fuse_cd_logic.lua.
   n1_vibration_logic     {},  -- N1 tachometer needle shake during AI-24 start (visual, below 23%)
 
   fire_logic             {},

@@ -2,23 +2,28 @@
 
   File: fuse_cd_logic.lua
   -----
-  Fuselage drag correction vs altitude (V11/v12)
+  Fuselage drag correction vs altitude (V11) — NOT REGISTERED
 
-  Tunes the aircraft speed at different altitudes to the RLE by adjusting the
-  fuselage drag coefficient (acf_fuse_cd). The engine power and aerodynamics
-  are calibrated to the RLE, but XP12 drag computation differs from reality —
-  especially at altitude where air density is lower. This module interpolates
-  a small correction over an altitude table.
+  SUPERSEDED by the v12 calibration: this module is deliberately absent from
+  the component list in main.lua, so nothing here runs.
 
-  Calibration method (standard atmosphere, level cruise at 52 deg UPRT):
-  measure stabilised IAS/TAS at the control altitudes, compare to the RLE
-  (main checkpoint: 6000 m, TAS 460 / IAS ~325), then raise fuse_cd where the
-  aircraft is too fast and lower it where too slow.
+  Under v12, fuselage and nacelle drag are expressed in the .acf misc bodies
+  (fuselage Cd 0.085, engine-to-body fairing / static fin / tail / An-26 left
+  and right nacelles Cd 0.075) instead of being overridden per frame from Lua.
+  With no writer, acf_fuse_cd simply holds its .acf value. That calibration is
+  paired with engine_logic's tro_table[0.52] = 0.807 and _power_max_limit 2810
+  — see the tro_table header comment; the three are tuned together.
 
-  Rollback: remove fuse_cd_logic from the component list in main.lua and the
-  base value from the .acf is restored.
+  The file is kept as the documented rollback path for the V11 approach:
+  re-add `fuse_cd_logic {}` to the V11 block in main.lua and this altitude
+  table takes over acf_fuse_cd again (pair it with tro_table[0.52] = 0.580).
 
---]] 
+  Original calibration method (standard atmosphere, level cruise at 52 deg
+  UPRT): measure stabilised IAS/TAS at the control altitudes, compare to the
+  RLE (main checkpoint: 6000 m, TAS 460 / IAS ~325), then raise fuse_cd where
+  the aircraft is too fast and lower it where too slow.
+
+--]]
 
 defineProperty("fcd_alt_m", globalProperty("sim/flightmodel/position/elevation")) -- metres MSL
 defineProperty("fcd_fuse_cd", globalProperty("sim/aircraft/bodies/acf_fuse_cd")) -- writable
