@@ -8,12 +8,12 @@ defineProperty("white", sasl.gl.loadImage("flightplan_e.dds", 20, 492, 5, 5))
 defineProperty("fplan_subpanel", globalProperty("an-24/panels/fplan_subpanel"))
 defineProperty("GPS_name", globalProperty("sim/cockpit2/radios/indicators/gps_nav_id"))
 defineProperty("GPS_dist", globalProperty("sim/cockpit2/radios/indicators/gps_dme_distance_nm"))
--- V11/XP12 FIX: the DME now works through NAV2 directly (as in XP11). In XP12
--- the DME channel became an independent receiver with its own frequency,
--- which broke the rangefinder — restore the XP11 behaviour via NAV2.
-defineProperty("DME_dist", globalProperty("sim/cockpit2/radios/indicators/nav2_dme_distance_nm")) -- NM, as in XP11
-defineProperty("DME_freq", globalProperty("sim/cockpit2/radios/actuators/nav2_frequency_hz")) -- NAV2 frequency
-defineProperty("DME_DME", globalProperty("sim/cockpit2/radios/indicators/nav2_has_dme")) -- NAV2 has DME
+-- XP12: the DME is an independent receiver with its own frequency, which is
+-- what this module assumes — it tunes the DME to one station while the Курс-МП
+-- units stay on another (see the "Boris handles the radios" block below).
+defineProperty("DME_dist", globalProperty("sim/cockpit2/radios/indicators/dme_dme_distance_nm")) -- NM
+defineProperty("DME_freq", globalProperty("sim/cockpit2/radios/actuators/dme_frequency_hz")) -- DME frequency
+defineProperty("DME_DME", globalProperty("sim/cockpit2/radios/indicators/dme_has_dme")) -- DME receives a station
 defineProperty("nav1_freq", globalProperty("sim/cockpit2/radios/actuators/nav1_frequency_hz"))
 defineProperty("nav1_course", globalProperty("sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot"))
 defineProperty("nav1_flag", globalProperty("sim/cockpit2/radios/indicators/nav1_flag_from_to_pilot"))

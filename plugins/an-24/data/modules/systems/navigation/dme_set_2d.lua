@@ -1,8 +1,8 @@
 size = {266, 115}
 
 -- define property table
--- V11/XP12 FIX: switched from dme_frequency_hz to nav2_frequency_hz (see dme_set.lua).
-defineProperty("frequency", globalProperty("sim/cockpit2/radios/actuators/nav2_frequency_hz")) -- set the frequency (XP12: NAV2)
+-- XP12: independent DME receiver, decoupled from NAV2 (see dme_set_3d.lua).
+defineProperty("frequency", globalProperty("sim/cockpit2/radios/actuators/dme_frequency_hz")) -- set the frequency (standalone DME)
 defineProperty("power_sw", globalProperty("an-24/gauges/dme_on")) -- power switcher
 
 -- images table

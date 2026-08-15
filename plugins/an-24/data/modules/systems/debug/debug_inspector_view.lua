@@ -1076,8 +1076,13 @@ local schema = {{
         max = 2.5,
         unit = "dot"
     }, {
+        label = "DME freq",
+        dref = "sim/cockpit2/radios/actuators/dme_frequency_hz",
+        kind = "value",
+        unit = ""
+    }, {
         label = "DME dist",
-        dref = "sim/cockpit2/radios/indicators/nav2_dme_distance_nm",
+        dref = "sim/cockpit2/radios/indicators/dme_dme_distance_nm",
         kind = "value",
         unit = "nm",
         dp = 1
@@ -1609,6 +1614,11 @@ local schema = {{
         dref = "sim/cockpit2/radios/actuators/adf2_frequency_hz",
         kind = "value",
         unit = "kHz"
+    }, {
+        label = "DME freq",
+        dref = "sim/cockpit2/radios/actuators/dme_frequency_hz",
+        kind = "value",
+        unit = ""
     }, {
         label = "XPDR power",
         dref = "an-24/sq/sq_sw",

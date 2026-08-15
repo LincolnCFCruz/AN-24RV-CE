@@ -2,11 +2,12 @@
 size = {200, 200}
 
 -- define properties
--- V11/XP12 FIX: switched to nav2_dme_distance_nm. In XP11 the dme_dme_distance
--- dataref worked automatically with NAV2; in XP12 the DME became a separate
--- receiver, so we read the NAV2 DME distance directly (nm x 1.852 = km).
-defineProperty("distance", globalProperty("sim/cockpit2/radios/indicators/nav2_dme_distance_nm")) -- distance in NM (XP12: NAV2)
+-- XP12: the DME is a separate receiver with its own frequency (dme_set_3d.lua
+-- tunes it), so read its own distance here (nm x 1.852 = km). Reading NAV2's
+-- DME instead forced the rangefinder to share the 2nd Курс-МП frequency.
+defineProperty("distance", globalProperty("sim/cockpit2/radios/indicators/dme_dme_distance_nm")) -- distance in NM (standalone DME)
 defineProperty("power_sw", globalProperty("an-24/gauges/dme_on")) -- power switcher
+defineProperty("dme_power", globalProperty("sim/cockpit2/radios/actuators/dme_power")) -- XP12 receiver on/off, follows power_sw + bus
 defineProperty("bus_DC_27_volt", globalProperty("an-24/power/bus_DC_27_volt"))
 defineProperty("dme_cc", globalProperty("an-24/gauges/dme_cc"))
 
@@ -46,7 +47,10 @@ function update()
         power = 0
     end
 
-    if power then
+    -- the XP12 receiver only ranges while it is switched on and the bus is live
+    set(dme_power, power)
+
+    if power > 0 then
         set(dme_cc, 5)
     else
         set(dme_cc, 0)

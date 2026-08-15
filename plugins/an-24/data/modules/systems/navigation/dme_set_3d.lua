@@ -1,9 +1,10 @@
 size = {80, 80}
 
 -- define property table
--- V11/XP12 FIX: switched from dme_frequency_hz to nav2_frequency_hz. In XP11
--- tuning NAV2 also tuned the DME; XP12 separated them — restore XP11 behaviour.
-defineProperty("frequency", globalProperty("sim/cockpit2/radios/actuators/nav2_frequency_hz")) -- set the frequency (XP12: NAV2)
+-- XP12: the DME (СД-67) is its own receiver again — it must NOT share the
+-- frequency of the 2nd Курс-МП (NAV2), otherwise tuning the rangefinder
+-- retunes the VOR/ILS and vice versa. dme_3d.lua drives dme_power.
+defineProperty("frequency", globalProperty("sim/cockpit2/radios/actuators/dme_frequency_hz")) -- set the frequency (standalone DME)
 
 -- images table
 defineProperty("glass_cap", sasl.gl.loadImage("scales_1.png", 142, 62, 78, 32))
