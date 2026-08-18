@@ -43,6 +43,8 @@ This project includes an adapted version of the KLN 90B GPS based on
 
 This project includes all XP12 upgrades made by Evgeny (An-24RV_XP12_FINALv11).
 
+This project includes Lovcio's windshield improvements, enabling windshield effects.
+
 ## License
 
 Licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for details.

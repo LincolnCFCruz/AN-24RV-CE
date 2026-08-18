@@ -4946,7 +4946,7 @@ TRIS 8805 66
 ANIM_end
 ANIM_begin
 ANIM_trans 0.592900 0.756200 1.828300 0.592900 0.756200 1.828300 0.000000 0.000000 none
-ANIM_rotate_begin 0.000000 0.000000 1.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 0.000000 0.000000 1.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 -14.060000
 ANIM_rotate_key 40.000000 -7.750000
 ANIM_rotate_key 80.000000 0.000000
@@ -4954,7 +4954,7 @@ ANIM_rotate_key 120.000000 27.459999
 ANIM_rotate_end
 ANIM_trans -0.592900 -0.756200 -1.828300 -0.592900 -0.756200 -1.828300 0.000000 0.000000 none
 ANIM_trans 0.592900 0.756200 1.828300 0.592900 0.756200 1.828300 0.000000 0.000000 none
-ANIM_rotate_begin 0.000000 1.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 0.000000 1.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 41.180000
 ANIM_rotate_key 40.000000 27.650000
 ANIM_rotate_key 80.000000 -0.000000
@@ -4962,7 +4962,7 @@ ANIM_rotate_key 120.000000 -4.180000
 ANIM_rotate_end
 ANIM_trans -0.592900 -0.756200 -1.828300 -0.592900 -0.756200 -1.828300 0.000000 0.000000 none
 ANIM_trans 0.592900 0.756200 1.828300 0.592900 0.756200 1.828300 0.000000 0.000000 none
-ANIM_rotate_begin 1.000000 0.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 1.000000 0.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 20.959999
 ANIM_rotate_key 40.000000 10.160000
 ANIM_rotate_key 80.000000 0.000000
@@ -4972,7 +4972,7 @@ ANIM_trans -0.592900 -0.756200 -1.828300 -0.592900 -0.756200 -1.828300 0.000000 
 TRIS 8871 66
 ANIM_begin
 ANIM_trans 0.474000 0.946100 1.984200 0.474000 0.946100 1.984200 0.000000 0.000000 none
-ANIM_rotate_begin 0.000000 0.000000 1.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 0.000000 0.000000 1.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 32.490002
 ANIM_rotate_key 40.000000 17.520000
 ANIM_rotate_key 80.000000 0.000000
@@ -4980,7 +4980,7 @@ ANIM_rotate_key 120.000000 -14.740000
 ANIM_rotate_end
 ANIM_trans -0.474000 -0.946100 -1.984200 -0.474000 -0.946100 -1.984200 0.000000 0.000000 none
 ANIM_trans 0.474000 0.946100 1.984200 0.474000 0.946100 1.984200 0.000000 0.000000 none
-ANIM_rotate_begin 0.000000 1.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 0.000000 1.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 -24.850000
 ANIM_rotate_key 40.000000 -17.610001
 ANIM_rotate_key 80.000000 -0.000000
@@ -4988,7 +4988,7 @@ ANIM_rotate_key 120.000000 27.330000
 ANIM_rotate_end
 ANIM_trans -0.474000 -0.946100 -1.984200 -0.474000 -0.946100 -1.984200 0.000000 0.000000 none
 ANIM_trans 0.474000 0.946100 1.984200 0.474000 0.946100 1.984200 0.000000 0.000000 none
-ANIM_rotate_begin 1.000000 0.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 1.000000 0.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 -38.049999
 ANIM_rotate_key 40.000000 -20.010000
 ANIM_rotate_key 80.000000 0.000000
@@ -5000,7 +5000,7 @@ ANIM_end
 ANIM_end
 ANIM_begin
 ANIM_trans 0.612400 0.752200 1.850600 0.612400 0.752200 1.850600 0.000000 0.000000 none
-ANIM_rotate_begin 0.000000 0.000000 1.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 0.000000 0.000000 1.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 -19.420000
 ANIM_rotate_key 40.000000 -17.260000
 ANIM_rotate_key 80.000000 0.000000
@@ -5008,7 +5008,7 @@ ANIM_rotate_key 120.000000 26.299999
 ANIM_rotate_end
 ANIM_trans -0.612400 -0.752200 -1.850600 -0.612400 -0.752200 -1.850600 0.000000 0.000000 none
 ANIM_trans 0.612400 0.752200 1.850600 0.612400 0.752200 1.850600 0.000000 0.000000 none
-ANIM_rotate_begin 0.000000 1.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 0.000000 1.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 38.579998
 ANIM_rotate_key 40.000000 22.400000
 ANIM_rotate_key 80.000000 -0.000000
@@ -5016,7 +5016,7 @@ ANIM_rotate_key 120.000000 -5.820000
 ANIM_rotate_end
 ANIM_trans -0.612400 -0.752200 -1.850600 -0.612400 -0.752200 -1.850600 0.000000 0.000000 none
 ANIM_trans 0.612400 0.752200 1.850600 0.612400 0.752200 1.850600 0.000000 0.000000 none
-ANIM_rotate_begin 1.000000 0.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[0]
+ANIM_rotate_begin 1.000000 0.000000 0.000000 sim/flightmodel2/misc/wiper_angle_deg[1]
 ANIM_rotate_key 0.000000 20.400000
 ANIM_rotate_key 40.000000 9.490000
 ANIM_rotate_key 80.000000 0.000000

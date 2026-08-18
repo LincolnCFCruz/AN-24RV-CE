@@ -70013,22 +70013,26 @@ TRIS 117795 180
 ANIM_end
 ANIM_begin
 ANIM_trans -0.861700 0.250400 2.418000 -0.861700 0.250400 2.418000 0.000000 0.000000 none
-ANIM_rotate 0.000000 1.000000 0.000000 0.000000 10.000000 0.000000 1.000000 sim/cockpit2/switches/wiper_speed
+ANIM_rotate 0.000000 1.000000 0.000000 0.000000 10.000000 0.000000 1.000000 	sim/cockpit2/switches/wiper_speed_switch[0]
 ANIM_trans 0.861700 -0.250400 -2.418000 0.861700 -0.250400 -2.418000 0.000000 0.000000 none
+ATTR_manip_axis_knob rotate_medium 0 3 -1 -1 sim/cockpit2/switches/wiper_speed_switch[0]
 TRIS 117975 144
 ANIM_end
 ANIM_begin
 ANIM_trans 0.848300 0.288100 2.480700 0.848300 0.288100 2.480700 0.000000 0.000000 none
-ANIM_rotate 0.000000 1.000000 0.000000 0.000000 10.000000 0.000000 1.000000 sim/cockpit2/switches/wiper_speed
+ANIM_rotate 0.000000 1.000000 0.000000 0.000000 10.000000 0.000000 1.000000 	sim/cockpit2/switches/wiper_speed_switch[1]
 ANIM_trans -0.848300 -0.288100 -2.480700 -0.848300 -0.288100 -2.480700 0.000000 0.000000 none
+ATTR_manip_axis_knob rotate_medium 0 3 -1 -1 sim/cockpit2/switches/wiper_speed_switch[1]
 TRIS 118119 144
 ANIM_end
 ANIM_begin
 ANIM_trans 0.000000 0.000000 0.000000 0.003300 -0.000100 -0.000800 0.000000 1.000000 an-24/gauges/siren_button
+ATTR_manip_push hand 1 0 an-24/gauges/siren_button
 TRIS 118263 168
 ANIM_end
 ANIM_begin
 ANIM_trans 0.000000 0.000000 0.000000 -0.002000 0.002100 -0.001900 0.000000 1.000000 an-24/gauges/iv41_test
+ATTR_manip_push hand 1 0 an-24/gauges/iv41_test
 TRIS 118431 168
 ANIM_end
 ANIM_begin
