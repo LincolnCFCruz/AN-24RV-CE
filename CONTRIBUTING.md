@@ -66,6 +66,10 @@ Before opening a pull request:
 2. Verify the affected systems.
 3. Check `plugins/an-24/data/output/SASLLog.txt` for new warnings or errors.
 4. If applicable, use the built-in inspector (`An-24/Debug/inspector`) to verify dataref values.
+5. For engine or aerodynamic calibration work, enable the flight-test logger by uncommenting
+   `flight_logger {}` in `main.lua`; it writes one `[AN24]` sample line (altitude, IAS, TAS, V/S,
+   torque, UPRT, N1) every 5 s to `SASLLog.txt` for comparison against the AFM tables.
+   Comment it out again before committing.
 
 Include a short description of your testing in the pull request.
 

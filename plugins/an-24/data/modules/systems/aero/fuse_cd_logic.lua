@@ -4,15 +4,18 @@
   -----
   Fuselage drag correction vs altitude (V11) — NOT REGISTERED
 
-  SUPERSEDED by the v12 calibration: this module is deliberately absent from
-  the component list in main.lua, so nothing here runs.
+  SUPERSEDED by the v12/v13 calibration: this module is deliberately absent
+  from the component list in main.lua, so nothing here runs.
 
-  Under v12, fuselage and nacelle drag are expressed in the .acf misc bodies
-  (fuselage Cd 0.085, engine-to-body fairing / static fin / tail / An-26 left
-  and right nacelles Cd 0.075) instead of being overridden per frame from Lua.
-  With no writer, acf_fuse_cd simply holds its .acf value. That calibration is
-  paired with engine_logic's tro_table[0.52] = 0.807 and _power_max_limit 2810
-  — see the tro_table header comment; the three are tuned together.
+  Since v12, fuselage and nacelle drag are expressed in the .acf misc bodies
+  instead of being overridden per frame from Lua; with no writer, acf_fuse_cd
+  simply holds its .acf value. v13 (19.08.2026) replaced the empirical body Cd
+  values with Bogoslavsky's (1972) breakdown of the An-24's Cx0 = 0.0244:
+  fuselage body/0 Cd 0.0831 (30% of Cx0), An-26 nacelles body/21,22 Cd 0.0764
+  (15%), empennage body/1,2,3 Cd 0.0750 (10%). That calibration is paired with
+  engine_logic's tro_table[0.52] = 0.605, its alt_table 0.96 cruise shelf and
+  _power_max_limit 2810 — see the tro_table header comment; the four are tuned
+  together.
 
   The file is kept as the documented rollback path for the V11 approach:
   re-add `fuse_cd_logic {}` to the V11 block in main.lua and this altitude

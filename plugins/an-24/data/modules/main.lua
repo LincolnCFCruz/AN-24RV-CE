@@ -181,6 +181,9 @@ components = {
   -- fuse_cd_logic       {},  -- NOT REGISTERED since the v12 calibration: fuselage/nacelle
                               -- drag now lives in the .acf misc bodies, so nothing overrides
                               -- acf_fuse_cd at runtime. See systems/aero/fuse_cd_logic.lua.
+  -- flight_logger       {},  -- NOT REGISTERED: flight-test logger, one [AN24] sample line
+                              -- every 5 s into SASLLog.txt. Uncomment when recalibrating the
+                              -- engine/aero tables. See systems/debug/flight_logger.lua.
   n1_vibration_logic     {},  -- N1 tachometer needle shake during AI-24 start (visual, below 23%)
 
   fire_logic             {},

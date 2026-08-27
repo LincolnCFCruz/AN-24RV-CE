@@ -13,6 +13,7 @@ local prop_RPM = gPf("sim/cockpit2/engine/actuators/prop_rotation_speed_rad_sec_
 -- XP12: temperature_ambient_c was replaced by aircraft/temperature_ambient_deg_c
 local sim_T = gPf("sim/weather/aircraft/temperature_ambient_deg_c") -- Temperature outside aircraft, deg C
 local msl_alt = gPf("sim/flightmodel/position/elevation") -- Barometric alt. maybe in feet, maybe in meters
+local agl_alt = gPf("sim/flightmodel/position/y_agl") -- Height above ground, metres (water injection gate)
 -- V11: use the pilot's altimeter setting (QNH) for the pressure correction instead of
 -- the (REPLACED) sea-level weather dataref. Standard is 29.92 inHg.
 local baro_setting = gPf("sim/cockpit/misc/barometer_setting") -- QNH in inHg as set by the pilot
@@ -29,6 +30,7 @@ local right_rud_need = 0.05
 local ru19_rud_need = 0
 local initialized = false
 local counter = 0
+local water_coef_smooth = 0.0 -- v13: smoothed water-injection recovery term (see water_inject_table)
 
 -- V11: KTA-24 inertia (fuel control unit of the real AI-24).
 -- The KTA-24 is a hydromechanical fuel governor with inherent lag: moving the
@@ -39,14 +41,19 @@ local right_rud_current = 0.05 -- smoothed right engine RUD
 local KTA24_RATE = 2.5 -- KTA-24 response rate (smaller = slower)
 
 -- Interpolation table for throttles
--- v12 calibration (14.08.2026, 43 test flights): the cruise point is set from
--- measured performance rather than the earlier V11 compromise (0.580 at 52 deg,
--- a midpoint between the RLE-derived 0.722 and Parshukov's original 0.490).
--- 0.807 at 52 deg gives TAS 474-484 km/h at 6000 m against the AFM's 460-472.
--- This value is calibrated TOGETHER with the .acf misc-body drag (fuselage
--- Cd 0.085 + An-26 engine nacelles) and _power_max_limit 2810 — with
--- fuse_cd_logic no longer overriding acf_fuse_cd at runtime. Do not retune one
--- of those three in isolation.
+-- v13 calibration (18-19.08.2026, 50+ test flights): the cruise point is 0.605
+-- at 52 deg. The preceding v12 value (0.807) never settled — it kept
+-- accelerating past the AFM cruise speed, reaching 559 km/h TAS in the teleport
+-- reference test against the AFM's 460-472. 0.605 stabilises at TAS ~472
+-- instead. It is bracketed: 0.575 could not hold 6000 m, 0.807 ran away.
+-- This value is calibrated TOGETHER with three other things — do not retune one
+-- of them in isolation:
+--   1. the .acf misc-body drag, now the Bogoslavsky (1972) breakdown of the
+--      An-24's Cx0 = 0.0244: fuselage body/0 Cd 0.0831 (30% of Cx0), An-26
+--      nacelles body/21,22 Cd 0.0764 (15%), empennage body/1,2,3 Cd 0.0750 (10%);
+--   2. alt_table below, which now holds 0.96 from 5000 m through cruise;
+--   3. .acf _power_max_limit 2810, with fuse_cd_logic still not overriding
+--      acf_fuse_cd at runtime.
 -- Low points (0.00-0.18) set the base idle; idle_correction_table then boosts the
 -- idle band toward N1 ~94% per the RLE (see Discovery #13 below).
 local tro_table = {
@@ -59,7 +66,7 @@ local tro_table = {
     {0.26, 0.340}, --  26 deg UPRT: taxi high
     {0.34, 0.430}, --  34 deg UPRT: 0.6 nominal (intermediate)
     {0.41, 0.500}, --  41 deg UPRT: 0.7 nominal (intermediate)
-    {0.52, 0.807}, --  52 deg UPRT: cruise (v12 — measured against AFM, see above)
+    {0.52, 0.605}, --  52 deg UPRT: cruise (v13 — stabilises at TAS ~472, see above)
     {0.65, 0.700}, --  65 deg UPRT: nominal (between RLE 0.850 and old 0.555)
     {0.74, 0.770}, --  74 deg UPRT
     {0.87, 0.850}, --  87 deg UPRT: lower bound of takeoff regime
@@ -96,6 +103,38 @@ local t_table = {{-1000, 1.15}, -- BUG workaround (very cold)
     {1000, 0.80} -- BUG workaround
 }
 
+-- v13 (19.08.2026) — AI-24 WATER INJECTION, per Bogoslavsky L.E. "Prakticheskaya
+-- aerodinamika An-24" (Transport, Moscow 1972), the Antonov OKB figures.
+--
+-- On a hot day the AI-24 loses power to thin air (that is what t_table models).
+-- The real engine injects water into the compressor: it evaporates, cools the
+-- charge, the denser air restores mass flow, and takeoff power comes back. This
+-- table is the recovery term ADDED to t_coef, so it cancels most of t_table's
+-- hot-day penalty: at +42 C, t_coef 0.88 + 0.15 = 1.03.
+--
+-- Automatic arming needs all three of:
+--   1. OAT >= +38 C            — hot day
+--   2. UPRT >= 95% (takeoff)   — averaged over both engines
+--   3. AGL < 50 m              — takeoff roll / initial climb, any airfield
+-- Losing any one of them fades the injection back out.
+--
+-- The 4 s / 3 s fade is the physical lag: water has to heat and evaporate on the
+-- way in, and the hot gases have to cool down on the way out (see smooth()).
+-- Limit per the RLE: above +45 C injection can no longer restore takeoff power.
+local water_inject_table = { -- OAT deg C, power-recovery term added to t_coef
+    {15, 0.000}, -- below +38 C: injection off
+    {37, 0.000}, -- below +38 C: injection off
+    {38, 0.120}, -- +38 C: restores t_coef to ~1.00
+    {40, 0.130}, -- +40 C
+    {42, 0.150}, -- +42 C
+    {44, 0.160}, -- +44 C
+    {45, 0.180}, -- +45 C: RLE limit — no recovery beyond this
+    {1000, 0.180} -- BUG workaround
+}
+local WATER_OAT_MIN = 38.0 -- deg C — hot-day threshold
+local WATER_RUD_MIN = 0.95 -- UPRT fraction — takeoff regime
+local WATER_AGL_MAX = 50.0 -- metres AGL — takeoff roll / initial climb
+
 -- Tables for temp correction
 local t_table_ru19 = {{-1000, 1.00}, -- BUG workaround
     {-30, 1.00}, -- -30 C
@@ -128,13 +167,19 @@ local idle_correction_table = { -- t deg C, idle_boost (multiplier on base tro t
 -- V11: raised alt_table so the aircraft can climb to 8000 m like the real An-24
 -- (with the old table it barely reached 7000 m). The AI-24 is supercharged and
 -- holds nearly 100% power up to its rated altitude ~5000 m, then decays smoothly.
+-- v13 (18.08.2026): the 5000-6000 m band is flattened to 0.96 (was 0.95/0.90).
+-- Per Bogoslavsky the AI-24's supercharger peaks around 3700 m and the decay
+-- above it is far gentler than the old step to 0.90 at cruise altitude; the
+-- flat shelf is what lets the aircraft still hold the 6000 m cruise level at
+-- the v13 tro_table[0.52] = 0.605. The two were measured together — see the
+-- tro_table header.
 local alt_table = {{-50000, 1.00}, -- BUG workaround
     {0.00, 0.72}, -- sea level: full power
     {4000, 0.84}, -- ~1200 m
     {8000, 0.96}, -- ~2400 m: holds full power
-    {12000, 1.00}, -- ~3700 m: holds full power
-    {16000, 0.95}, -- ~5000 m: rated altitude
-    {20000, 0.90}, -- ~6000 m: cruise — gentle decay
+    {12000, 1.00}, -- ~3700 m: supercharger hump — peak power (Bogoslavsky)
+    {16000, 0.96}, -- ~5000 m: rated altitude
+    {20000, 0.96}, -- ~6000 m: cruise — still on the shelf
     {24000, 0.84}, -- ~7300 m: moderate decay
     {28000, 0.78}, -- ~8500 m: near the ceiling
     {32000, 0.71}, -- ~9750 m: beyond the ceiling
@@ -294,7 +339,8 @@ function update()
         -- Deviation from standard 29.92 inHg gives ~1000 ft per inHg.
         local alt_baro = (29.92 - get(baro_setting)) * 1000
         local alt_coef = interpolate(alt_table, alt + alt_baro) -- Altitude coeficient for limit power under crit alt
-        local t_coef = interpolate(t_table, get(sim_T))
+        local oat = get(sim_T) -- outside air temperature, deg C
+        local t_coef = interpolate(t_table, oat)
 
         -- RUD calculations
         -- V11: rud_minimum = 0.10 so the UPRT-2 shows 10% at flight idle
@@ -303,7 +349,7 @@ function update()
         local stop_active = get(rud_close) == 0
         local stop_active_ru19 = get(rud_close_ru19) == 0
         local stopor_active = get(rud_stopor) > 0.5
-        local heat = get(wing_ht) -- Wing heat takes some power from engines
+        local heat = get(wing_ht) or 0 -- Wing heat takes some power from engines
 
         -- Limit left rud
         -- V11 "spring-back" fix: the limiter used to act whenever rud1_out=true,
@@ -381,10 +427,25 @@ function update()
         local average_rud = (left_rud_last + right_rud_last) * 0.5
         local heat_loss = 1.0 - (heat * 0.05 * average_rud)
 
+        -- v13 AI-24 water injection (Bogoslavsky 1972) — see water_inject_table.
+        -- Armed automatically on a hot day at takeoff power near the ground; the
+        -- recovery term is added to t_coef so it cancels most of t_table's
+        -- hot-day penalty. The gate uses average_rud, so it behaves the same on
+        -- both engines and stays off with one engine at idle.
+        local water_target = 0.0
+        if oat >= WATER_OAT_MIN and average_rud >= WATER_RUD_MIN and get(agl_alt) < WATER_AGL_MAX then
+            water_target = interpolate(water_inject_table, oat)
+        end
+        -- Asymmetric fade: ~4 s to come on (water heating and evaporating),
+        -- ~3 s to fade out (hot gases cooling down).
+        local water_rate = water_target > water_coef_smooth and 4.0 or 3.0
+        water_coef_smooth = smooth(water_coef_smooth, water_target, water_rate)
+        t_coef = t_coef + water_coef_smooth
+
         -- V11 idle correction (Discovery #13): boost idle toward N1 ~94% per the RLE.
         -- idle_boost depends only on OAT, so it is the same for both engines; the blend
         -- fades it out above the idle band so cruise/climb/takeoff stay as calibrated.
-        local idle_boost = interpolate(idle_correction_table, get(sim_T))
+        local idle_boost = interpolate(idle_correction_table, oat)
 
         -- Left engine (with anti-ice bleed, idle correction and output thrust smoothing)
         local blend_left = idle_blend_factor(left_rud_last)
@@ -400,7 +461,7 @@ function update()
 
         -- RU19
         local alt_coef_ru19 = interpolate(alt_table_ru19, alt + alt_baro) -- Altitude coeficient for limit power under crit alt
-        local t_coef_ru19 = interpolate(t_table_ru19, get(sim_T))
+        local t_coef_ru19 = interpolate(t_table_ru19, oat)
         local ru19_throttle = interpolate(tro_table_ru19, third_rud_last) * alt_coef_ru19 * t_coef_ru19
         set(drf_engn.thro_need_3, smooth(get(drf_engn.thro_need_3), ru19_throttle, 4.0))
     end

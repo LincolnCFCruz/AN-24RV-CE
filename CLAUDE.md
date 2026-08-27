@@ -282,6 +282,8 @@ A built-in developer tool helps inspect live state:
 Bind a key to the X-Plane command **`An-24/Debug/inspector`** (registered by `systems/debug/debug_inspector.lua`, instantiated from `main.lua` right after `panel_windows {}`).
 It opens a tabbed floating window (`debug_inspector_view`) that reads aircraft state **by dataref name only** -- it touches no systems code, so it's safe to leave bound. Use it to confirm a change moved the datarefs you expected before/after.
 
+A second dev tool covers the flight-test side: `systems/debug/flight_logger.lua` prints one `[AN24]` sample line (altitude, IAS, TAS, V/S, torque, UPRT, N1) every 5 s of flight into `SASLLog.txt`, which is how the engine/aero calibration tables are compared against the AFM. It is **deliberately not registered** -- uncomment `flight_logger {}` in `main.lua` while calibrating, and comment it back out (same convention as `fuse_cd_logic`).
+
 ## 16. Instrument Glossary
 
 Russian-designation modules, described by function:
